@@ -11,6 +11,7 @@ load_dotenv()
 
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 GEMINI_MODEL = os.getenv('GEMINI_MODEL_NAME')
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 @csrf_exempt
 def top_diseases(request):
@@ -57,7 +58,6 @@ def top_diseases(request):
 @csrf_exempt
 def top_outbreaks(request):
     
-    client = genai.Client(GEMINI_API_KEY)
 
     grounding_tool = types.Tool(
         google_search=types.GoogleSearch()
@@ -110,7 +110,7 @@ def top_outbreaks(request):
 @csrf_exempt
 def top_meds(request):
     
-    client = genai.Client(GEMINI_API_KEY)
+
 
     grounding_tool = types.Tool(
         google_search=types.GoogleSearch()
