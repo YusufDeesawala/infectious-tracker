@@ -4,6 +4,8 @@
 
 This backend provides structured **JSON responses** that can be consumed by dashboards, mobile apps, or research tools.
 
+Backend Deployed link = https://infectious-tracker-backend.onrender.com
+
 ---
 
 ## 🚀 Features
