@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types  
+import re
 import os
 
 load_dotenv()
@@ -57,6 +58,7 @@ def top_diseases(request):
     
 @csrf_exempt
 def top_outbreaks(request):
+    client = genai.Client(api_key=GEMINI_API_KEY)
     
 
     grounding_tool = types.Tool(
@@ -70,25 +72,12 @@ def top_outbreaks(request):
     prompt = '''Please return a JSON array of the top 10 recent verified health news stories focused on disease outbreaks. Each entry should be an object with the following fields:
 
         - "headline": (string) — the title of the news article.
-        - "imageurl": (string) — the URL of an image associated with the news (if available, otherwise empty string).
         - "summary": (string) — a concise summary of the news content.
         - "affected_count": (integer or null) — the number of confirmed affected cases, or null if unavailable.
         - "cured_count": (integer or null) — the number of confirmed cured/recovered cases, or null if unavailable.
         - "threat_level": (string) — one of "Low", "Moderate", or "High", based on severity (e.g., number of deaths, transmissibility, public concern).
 
-    Return exactly 10 items. Ensure all values are properly typed, and where data isn't available, use null. Example format:
-
-        [
-            {
-                "headline": "Example outbreak headline",
-                "imageurl": "https://example.com/image.jpg",
-                "summary": "Brief summary here...",
-                "affected_count": 500,
-                "cured_count": 450,
-                "threat_level": "Moderate"
-            },
-            ...
-        ]
+    Return exactly 10 items. Ensure all values are properly typed, and where data isn't available, use null. Return ONLY valid JSON. Do not include any explanation or commentary.
     '''
 
     try:
@@ -100,7 +89,14 @@ def top_outbreaks(request):
 
         content = response.text.strip()
 
-        data = json.loads(content)
+        def extract_json_from_response(response_text):
+            match = re.search(r'\[.*\]', response_text, re.DOTALL)
+            if match:
+                return json.loads(match.group(0))
+            else:
+                raise ValueError("No JSON array found in Gemini response.")
+
+        data = extract_json_from_response(content)
 
         return JsonResponse(data, safe=False)
 
@@ -109,8 +105,7 @@ def top_outbreaks(request):
     
 @csrf_exempt
 def top_meds(request):
-    
-
+    client = genai.Client(api_key=GEMINI_API_KEY)
 
     grounding_tool = types.Tool(
         google_search=types.GoogleSearch()
@@ -120,22 +115,12 @@ def top_meds(request):
         tools=[grounding_tool]
     )
 
-    prompt = '''Please return a JSON array of the top 10 recent verified health news stories focused on latest medication innovation and releases. Each entry should be an object with the following fields:
+    prompt = '''Please return a JSON array of the top 10 recent verified health news stories focused on latest medical innovation and releases. Each entry should be an object with the following fields:
 
         - "headline": (string) — the title of the news article.
-        - "imageurl": (string) — the URL of an image associated with the news (if available, otherwise empty string).
         - "summary": (string) — a concise summary of the news content.
 
-    Return exactly 10 items. Ensure all values are properly typed, and where data isn't available, use null. Example format:
-
-        [
-            {
-                "headline": "Example outbreak headline",
-                "imageurl": "https://example.com/image.jpg",
-                "summary": "Brief summary here..."
-            },
-            ...
-        ]
+    Return exactly 10 items. Ensure all values are properly typed, and where data isn't available, use null. Return ONLY valid JSON. Do not include any explanation or commentary.
     '''
 
     try:
@@ -147,10 +132,16 @@ def top_meds(request):
 
         content = response.text.strip()
 
-        data = json.loads(content)
+        def extract_json_from_response(response_text):
+            match = re.search(r'\[.*\]', response_text, re.DOTALL)
+            if match:
+                return json.loads(match.group(0))
+            else:
+                raise ValueError("No JSON array found in Gemini response.")
+
+        data = extract_json_from_response(content)
 
         return JsonResponse(data, safe=False)
 
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
-
