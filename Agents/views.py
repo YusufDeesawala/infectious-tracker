@@ -73,8 +73,12 @@ def top_outbreaks(request):
 
         - "headline": (string) — the title of the news article.
         - "summary": (string) — a concise summary of the news content.
-        - "affected_count": (integer or null) — the number of confirmed affected cases, or null if unavailable.
-        - "cured_count": (integer or null) — the number of confirmed cured/recovered cases, or null if unavailable.
+        - "affected_week": (integer or null) — the number of confirmed affected cases in the entire week, or a hypothetical number if unavailable.
+        - "affected_month": (integer or null) — the number of confirmed affected cases in the entire month, or a hypothetical number if unavailable.
+        - "affected_year": (integer or null) — the number of confirmed affected cases in the entire year, or a hypothetical number if unavailable.
+        - "cured_week": (integer or null) — the number of confirmed cured/recovered cases in the entire week, or a hypothetical number if unavailable.
+        - "cured_month": (integer or null) — the number of confirmed cured/recovered cases in the entire month, or a hypothetical number if unavailable.
+        - "cured_year": (integer or null) — the number of confirmed cured/recovered cases in the entire year, or a hypothetical number if unavailable.
         - "threat_level": (string) — one of "Low", "Moderate", or "High", based on severity (e.g., number of deaths, transmissibility, public concern).
 
     Return exactly 10 items. Ensure all values are properly typed, and where data isn't available, use null. Return ONLY valid JSON. Do not include any explanation or commentary.
