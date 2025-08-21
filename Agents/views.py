@@ -20,13 +20,21 @@ def top_diseases(request):
         return JsonResponse({"error": "Use POST"}, status=405)
 
     prompt = """
-    Please respond ONLY with a JSON array of the top 3 diseases currently spreading worldwide. 
-    Do not include code fences, explanations, or extra text.
-    Each item must have:
-    - "name": disease name
-    - "location": geographic area
-    - "cases": estimated number of people affected
-    - "reference_url": source URL
+        Please respond ONLY with a JSON array of the top 3 diseases currently spreading worldwide.  
+        Each item must have:  
+        - "name": disease name  
+        - "location": geographic area  
+        - "weekly_cases": number of people affected this week (digits only)  
+        - "monthly_cases": number of people affected this month (digits only)  
+        - "yearly_cases": number of people affected this year (digits only)  
+        - "weekly_cured": number of people cured this week (digits only)  
+        - "monthly_cured": number of people cured this month (digits only)  
+        - "yearly_cured": number of people cured this year (digits only)  
+        - "reference_url": source URL  
+
+        Do not include code fences, explanations, or extra text.
+
+
     """
 
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
