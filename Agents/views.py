@@ -34,6 +34,8 @@ def top_diseases(request):
 
         Do not include code fences, explanations, or extra text.
 
+        if You dont have the exact data can u just else give me the past data and predict the curent status of the disease and give me the values accordinlgy.
+
 
     """
 
@@ -46,6 +48,7 @@ def top_diseases(request):
 
     try:
         response = requests.post(url, headers=headers, json=payload)
+        print(response)
         data = response.json()
 
         text = data["candidates"][0]["content"]["parts"][0]["text"]

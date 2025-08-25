@@ -1,24 +1,25 @@
 # 🦠 Infectious Tracker Backend
 
-**Infectious Tracker Backend** is a Django-based API project designed to create **AI-powered health intelligence agents**. These agents use **Google Gemini** (Generative AI) to fetch and process real-time information about **infectious diseases** and outbreaks worldwide.
+**Infectious Tracker Backend** is a Django-based API project designed to create **AI-powered health intelligence agents**.
+These agents use **Google Gemini** (Generative AI) to fetch, predict, and process real-time information about **infectious diseases**, **outbreaks**, and **medical innovations** worldwide.
 
 This backend provides structured **JSON responses** that can be consumed by dashboards, mobile apps, or research tools.
 
-Backend Deployed link = https://infectious-tracker-backend.onrender.com
+🔗 **Deployed Link:** [https://infectious-tracker-backend.onrender.com](https://infectious-tracker-backend.onrender.com)
 
 ---
 
 ## 🚀 Features
 
-* Built with **Django REST style endpoints**
+* Built with **Django REST-style endpoints**
 * Agents powered by **Google Gemini API**
-* Real-time outbreak monitoring (using news + health org references)
+* Real-time outbreak monitoring with **Google Search grounding**
 * JSON-first responses (easy integration with apps & frontend)
 * Scalable: more agents can be added for different disease/health tasks
 
 ---
 
-## 🧩 Current Agents
+## 🧩 Current Agents (Endpoints)
 
 ### 1. 🌍 **Top Infectious Diseases Agent**
 
@@ -31,13 +32,14 @@ POST /api/top-diseases/
 **What it does:**
 
 * Fetches the **top 3 currently spreading diseases worldwide**.
-* Uses Gemini to search & summarize global outbreak news and health data.
+* If current data isn’t available, predicts trends using past outbreak data.
 * Returns structured JSON with:
 
-  * **name** → disease name
-  * **location** → primary affected region(s)
-  * **cases** → estimated number of affected people
-  * **reference\_url** → trusted source link (WHO, CDC, AP, etc.)
+  * `name` → disease name
+  * `location` → primary affected region(s)
+  * `weekly_cases` / `monthly_cases` / `yearly_cases`
+  * `weekly_cured` / `monthly_cured` / `yearly_cured`
+  * `reference_url` → trusted source link (WHO, CDC, AP, etc.)
 
 **Response Template:**
 
@@ -46,40 +48,86 @@ POST /api/top-diseases/
   "top_diseases": [
     {
       "name": "Disease Name",
-      "location": "Primary affected regions",
-      "cases": "Estimated cases (with timeframe)",
-      "reference_url": "Trusted source URL"
-    },
-    ...
+      "location": "Primary affected region(s)",
+      "weekly_cases": 100,
+      "monthly_cases": 400,
+      "yearly_cases": 1500,
+      "weekly_cured": 80,
+      "monthly_cured": 350,
+      "yearly_cured": 1200,
+      "reference_url": "https://trustedsource.org/example"
+    }
   ]
 }
 ```
 
-**Example Response:**
+---
+
+### 2. 📰 **Top Outbreaks Agent**
+
+**Endpoint:**
+
+```
+POST /api/top-outbreaks/
+```
+
+**What it does:**
+
+* Fetches the **top 10 recent verified health news stories** focused on disease outbreaks.
+* Uses **Gemini with Google Search grounding** for reliable information.
+* Returns structured JSON with:
+
+  * `headline` → news title
+  * `summary` → short article summary
+  * `affected_week` / `affected_month` / `affected_year` (numbers or null if unavailable)
+  * `cured_week` / `cured_month` / `cured_year` (numbers or null if unavailable)
+  * `threat_level` → `"Low" | "Moderate" | "High"`
+
+**Response Template:**
 
 ```json
-{
-  "top_diseases": [
-    {
-      "name": "Dengue",
-      "location": "Americas, Asia, Africa",
-      "cases": "Over 1.8 million suspected cases reported as of 2024",
-      "reference_url": "https://www.paho.org/en/documents/epidemiological-update-dengue-23-february-2024"
-    },
-    {
-      "name": "Cholera",
-      "location": "Africa and Asia",
-      "cases": "Over 700,000 reported cases globally in 2023",
-      "reference_url": "https://www.who.int/emergencies/disease-outbreak-news/item/2024-DON504"
-    },
-    {
-      "name": "Measles",
-      "location": "Africa, Asia, Europe",
-      "cases": "Over 306,000 reported cases globally in 2023",
-      "reference_url": "https://www.who.int/news/item/20-02-2024-measles-cases-continue-to-surge-globally--putting-millions-of-children-at-risk"
-    }
-  ]
-}
+[
+  {
+    "headline": "Outbreak of Dengue in South America",
+    "summary": "Health authorities report rising dengue cases across Brazil and Argentina.",
+    "affected_week": 1200,
+    "affected_month": 5600,
+    "affected_year": 72000,
+    "cured_week": 800,
+    "cured_month": 4200,
+    "cured_year": 65000,
+    "threat_level": "Moderate"
+  }
+]
+```
+
+---
+
+### 3. 💊 **Top Medical Innovations Agent**
+
+**Endpoint:**
+
+```
+POST /api/top-meds/
+```
+
+**What it does:**
+
+* Fetches the **top 10 recent verified health news stories** focused on **medical innovations and drug releases**.
+* Returns structured JSON with:
+
+  * `headline` → news title
+  * `summary` → short article summary
+
+**Response Template:**
+
+```json
+[
+  {
+    "headline": "New Malaria Vaccine Approved by WHO",
+    "summary": "The WHO has approved a groundbreaking malaria vaccine expected to save millions of lives annually."
+  }
+]
 ```
 
 ---
@@ -94,28 +142,40 @@ python manage.py runserver
 
 ### 2. Test with Postman / cURL
 
-**Request:**
+#### Example: Fetch Top Diseases
 
-* Method: `POST`
-* URL: `http://127.0.0.1:8000/api/top-diseases/`
-* Headers:
+```bash
+curl -X POST http://127.0.0.1:8000/api/top-diseases/ \
+     -H "Content-Type: application/json"
+```
 
-  * `Content-Type: application/json`
-* Body: *(leave empty)*
+#### Example: Fetch Top Outbreaks
 
-**Response:** JSON with the top 3 diseases (see example above).
+```bash
+curl -X POST http://127.0.0.1:8000/api/top-outbreaks/ \
+     -H "Content-Type: application/json"
+```
+
+#### Example: Fetch Top Medical Innovations
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/top-meds/ \
+     -H "Content-Type: application/json"
+```
 
 ---
 
 ## 🔑 Configuration
 
-* **Gemini API Key**:
-  Set your Gemini API key in the project (usually via `settings.py` or environment variables).
+* **Gemini API Key**
+  Set your Gemini API key in `.env` file:
 
   ```bash
-  export GEMINI_API_KEY="your_api_key_here"
+  GEMINI_API_KEY=your_api_key_here
+  GEMINI_MODEL_NAME=gemini-2.5-flash
   ```
 
-* **Model Used**:
-  Currently uses `gemini-2.5-flash` (can be upgraded to `gemini-pro` or `gemini-2.5-flash`).
+* **Environment Variables** are loaded via `python-dotenv`.
 
+* **Model Used**:
+  Currently defaults to `gemini-2.5-flash`, but you can upgrade to `gemini-pro` or newer versions.
