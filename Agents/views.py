@@ -2,6 +2,7 @@ import requests
 import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types  
@@ -53,7 +54,7 @@ def top_diseases(request):
 
         text = data["candidates"][0]["content"]["parts"][0]["text"]
 
-        # 🔥 Clean Gemini response (remove code fences if present)
+        # Clean Gemini response (remove code fences if present)
         cleaned = text.strip()
         if cleaned.startswith("```"):
             cleaned = cleaned.split("```")[1]  # take content inside
@@ -92,7 +93,7 @@ def top_outbreaks(request):
         - "cured_year": (integer or null) — the number of confirmed cured/recovered cases in the entire year, or a hypothetical number if unavailable.
         - "threat_level": (string) — one of "Low", "Moderate", or "High", based on severity (e.g., number of deaths, transmissibility, public concern).
 
-    Return exactly 10 items. Ensure all values are properly typed, and where data isn't available, use null. Return ONLY valid JSON. Do not include any explanation or commentary.
+    Return exactly 10 items. Ensure all values are properly typed, and where data isn't available, use a hypothetical value. Return ONLY valid JSON. Do not include any explanation or commentary.
     '''
 
     try:
@@ -160,3 +161,7 @@ def top_meds(request):
 
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+
+def dashboard(request):
+    """Render the main dashboard page"""
+    return render(request, 'dashboard.html')
