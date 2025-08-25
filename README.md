@@ -7,7 +7,7 @@
 
 The system provides structured **JSON responses** for API consumers as well as a **built-in frontend** for human-readable reports.
 
-🔗 **Deployed Link:** [https://infectious-tracker-backend.onrender.com](https://infectious-tracker-backend.onrender.com)
+🔗 **Backend Deployed Link:** [https://infectious-tracker-backend.onrender.com](https://infectious-tracker-backend.onrender.com)
 
 ---
 
