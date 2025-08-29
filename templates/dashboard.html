@@ -156,7 +156,7 @@
         .chart-header {
             display: flex;
             align-items: center;
-            justify-content: between;
+            justify-content: space-between;
             margin-bottom: 20px;
             padding-bottom: 16px;
             border-bottom: 1px solid rgba(148, 163, 184, 0.2);
@@ -298,6 +298,17 @@
             color: #94a3b8;
         }
 
+        .error-message {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            color: #ef4444;
+            font-size: 1rem;
+            text-align: center;
+        }
+
         .spinner {
             width: 32px;
             height: 32px;
@@ -320,6 +331,124 @@
 
         .animate-count {
             animation: countUp 0.8s ease-out;
+        }
+
+        /* Chatbot Styles */
+        .chatbot-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #60a5fa, #34d399);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .chatbot-button:hover {
+            transform: scale(1.1);
+        }
+
+        .chatbot-window {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 320px;
+            height: 400px;
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(51, 65, 85, 0.8));
+            border-radius: 16px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+        }
+
+        .chatbot-header {
+            padding: 12px 16px;
+            background: rgba(15, 23, 42, 0.9);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .chatbot-header h3 {
+            font-size: 1.1rem;
+            color: #f8fafc;
+            margin: 0;
+        }
+
+        .chatbot-close {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background: rgba(59, 130, 246, 0.2);
+            color: #e2e8f0;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .bot-message {
+            align-self: flex-start;
+            background: rgba(34, 197, 94, 0.2);
+            color: #e2e8f0;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .chatbot-input {
+            display: flex;
+            padding: 12px;
+            border-top: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .chatbot-input input {
+            flex: 1;
+            padding: 8px 12px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 20px 0 0 20px;
+            color: #e2e8f0;
+            font-size: 0.9rem;
+        }
+
+        .chatbot-input button {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #60a5fa, #34d399);
+            color: white;
+            border: none;
+            border-radius: 0 20px 20px 0;
+            cursor: pointer;
+            font-weight: 600;
         }
 
         /* Responsive Design */
@@ -356,6 +485,7 @@
             }
             .stats { grid-template-columns: 1fr; }
             .header h1 { font-size: 2rem; }
+            .chatbot-window { width: 280px; height: 350px; }
         }
     </style>
 </head>
@@ -470,10 +600,27 @@
         </div>
     </div>
 
+    <!-- Chatbot Button and Window -->
+    <button class="chatbot-button" id="chatbotButton">
+        <i class="fas fa-robot"></i>
+    </button>
+    <div class="chatbot-window" id="chatbotWindow">
+        <div class="chatbot-header">
+            <h3>Health Data Chatbot</h3>
+            <button class="chatbot-close" id="chatbotClose">&times;</button>
+        </div>
+        <div class="chatbot-messages" id="chatbotMessages"></div>
+        <div class="chatbot-input">
+            <input type="text" id="chatbotInput" placeholder="Ask about diseases, outbreaks, or meds...">
+            <button id="chatbotSend">Send</button>
+        </div>
+    </div>
+
     <script>
         let casesChart, threatChart;
         let diseaseData = [];
         let outbreakData = [];
+        let medNews = [];
 
         // Get CSRF token for Django requests
         function getCookie(name) {
@@ -494,7 +641,7 @@
         // Load data from Django API endpoints
         async function loadData() {
             try {
-                // Load disease data from Django API
+                // Load disease data
                 const diseaseResponse = await fetch('/api/top-diseases', {
                     method: 'POST',
                     headers: {
@@ -502,10 +649,17 @@
                         'X-CSRFToken': getCookie('csrftoken')
                     }
                 });
+                if (!diseaseResponse.ok) {
+                    throw new Error(`Disease API failed with status ${diseaseResponse.status}: ${await diseaseResponse.text()}`);
+                }
                 const diseaseResult = await diseaseResponse.json();
-                diseaseData = diseaseResult.top_diseases || [];
+                diseaseData = Array.isArray(diseaseResult.top_diseases) ? diseaseResult.top_diseases : [];
+                if (!diseaseData.length) {
+                    throw new Error('No disease data returned from API');
+                }
+                console.log('Loaded disease data:', diseaseData);
 
-                // Load outbreak data from Django API
+                // Load outbreak data
                 const outbreakResponse = await fetch('/api/top-outbreaks', {
                     method: 'POST',
                     headers: {
@@ -513,38 +667,37 @@
                         'X-CSRFToken': getCookie('csrftoken')
                     }
                 });
+                if (!outbreakResponse.ok) {
+                    throw new Error(`Outbreak API failed with status ${outbreakResponse.status}: ${await outbreakResponse.text()}`);
+                }
                 outbreakData = await outbreakResponse.json();
+                if (!Array.isArray(outbreakData)) {
+                    throw new Error('Outbreak data is not an array');
+                }
+                console.log('Loaded outbreak data:', outbreakData);
 
             } catch (error) {
-                console.error('Error loading data:', error);
-                // Fallback to mock data if API fails
-                diseaseData = [
-                    {
-                        name: "Influenza A (H3N2)",
-                        location: "Global",
-                        weekly_cases: 125420,
-                        weekly_cured: 118200
-                    },
-                    {
-                        name: "Dengue Fever",
-                        location: "Southeast Asia",
-                        weekly_cases: 18920,
-                        weekly_cured: 17100
-                    },
-                    {
-                        name: "Mpox (Monkeypox)",
-                        location: "Central & West Africa",
-                        weekly_cases: 4340,
-                        weekly_cured: 4100
-                    }
-                ];
-                outbreakData = [
-                    {
-                        headline: "Global Health Monitoring Active",
-                        summary: "Real-time disease tracking system operational.",
-                        threat_level: "Low"
-                    }
-                ];
+                console.error('Error loading data:', error.message);
+                diseaseData = [];
+                outbreakData = [];
+                // Update UI to show error messages
+                document.getElementById('diseaseGrid').innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Failed to load disease data. Please try again later.</p>
+                    </div>
+                `;
+                document.getElementById('newsGrid').innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Failed to load outbreak data. Please try again later.</p>
+                    </div>
+                `;
+                // Reset stats to 0
+                document.getElementById('totalCases').textContent = '0';
+                document.getElementById('totalCured').textContent = '0';
+                document.getElementById('activeOutbreaks').textContent = '0';
+                document.getElementById('highThreat').textContent = '0';
             }
         }
 
@@ -582,17 +735,17 @@
             casesChart = new Chart(casesCtx, {
                 type: 'bar',
                 data: {
-                    labels: diseaseData.map(d => d.name),
+                    labels: diseaseData.length ? diseaseData.map(d => d.name) : ['No Data'],
                     datasets: [{
                         label: 'Weekly Cases',
-                        data: diseaseData.map(d => d.weekly_cases || 0),
+                        data: diseaseData.length ? diseaseData.map(d => d.weekly_cases || 0) : [0],
                         backgroundColor: 'rgba(239, 68, 68, 0.8)',
                         borderColor: 'rgba(239, 68, 68, 1)',
                         borderWidth: 2,
                         borderRadius: 4
                     }, {
                         label: 'Weekly Recovered',
-                        data: diseaseData.map(d => d.weekly_cured || 0),
+                        data: diseaseData.length ? diseaseData.map(d => d.weekly_cured || 0) : [0],
                         backgroundColor: 'rgba(34, 197, 94, 0.8)',
                         borderColor: 'rgba(34, 197, 94, 1)',
                         borderWidth: 2,
@@ -645,7 +798,7 @@
                 data: {
                     labels: ['Low Risk', 'Moderate Risk', 'High Risk'],
                     datasets: [{
-                        data: [threatCounts.Low, threatCounts.Moderate, threatCounts.High],
+                        data: outbreakData.length ? [threatCounts.Low, threatCounts.Moderate, threatCounts.High] : [0, 0, 0],
                         backgroundColor: [
                             'rgba(34, 197, 94, 0.8)',
                             'rgba(245, 158, 11, 0.8)',
@@ -681,15 +834,24 @@
 
         function renderDiseases() {
             const grid = document.getElementById('diseaseGrid');
+            if (!diseaseData.length) {
+                grid.innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Failed to load disease data. Please try again later.</p>
+                    </div>
+                `;
+                return;
+            }
             grid.innerHTML = diseaseData.map(disease => `
                 <div class="disease-item">
                     <div class="disease-name">
                         <i class="fas fa-virus"></i>
-                        ${disease.name}
+                        ${disease.name || 'Unknown'}
                     </div>
                     <div class="disease-location">
                         <i class="fas fa-map-marker-alt"></i>
-                        ${disease.location}
+                        ${disease.location || 'N/A'}
                     </div>
                     <div class="disease-stats-mini">
                         <div class="mini-stat">
@@ -707,13 +869,22 @@
 
         function renderOutbreaks() {
             const grid = document.getElementById('newsGrid');
+            if (!outbreakData.length) {
+                grid.innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Failed to load outbreak data. Please try again later.</p>
+                    </div>
+                `;
+                return;
+            }
             grid.innerHTML = outbreakData.map(outbreak => `
                 <div class="news-item">
-                    <div class="news-headline">${outbreak.headline}</div>
-                    <div class="news-summary">${outbreak.summary}</div>
+                    <div class="news-headline">${outbreak.headline || 'No headline'}</div>
+                    <div class="news-summary">${outbreak.summary || 'No summary'}</div>
                     <div class="news-meta">
-                        <div class="threat-badge threat-${outbreak.threat_level.toLowerCase()}">
-                            ${outbreak.threat_level} Risk
+                        <div class="threat-badge threat-${(outbreak.threat_level || 'Low').toLowerCase()}">
+                            ${outbreak.threat_level || 'Low'} Risk
                         </div>
                         <div class="affected-count">
                             <i class="fas fa-users"></i>
@@ -725,6 +896,7 @@
         }
 
         async function renderMedicalNews() {
+            const grid = document.getElementById('medGrid');
             try {
                 const response = await fetch('/api/top-meds', {
                     method: 'POST',
@@ -733,13 +905,19 @@
                         'X-CSRFToken': getCookie('csrftoken')
                     }
                 });
-                const medNews = await response.json();
+                if (!response.ok) {
+                    throw new Error(`Medical news API failed with status ${response.status}: ${await response.text()}`);
+                }
+                medNews = await response.json();
+                if (!Array.isArray(medNews) || !medNews.length) {
+                    throw new Error('No medical news data returned from API');
+                }
+                console.log('Loaded medical news:', medNews);
 
-                const grid = document.getElementById('medGrid');
                 grid.innerHTML = medNews.map(news => `
                     <div class="news-item">
-                        <div class="news-headline">${news.headline}</div>
-                        <div class="news-summary">${news.summary}</div>
+                        <div class="news-headline">${news.headline || 'No headline'}</div>
+                        <div class="news-summary">${news.summary || 'No summary'}</div>
                         <div class="news-meta">
                             <div class="threat-badge" style="background: rgba(99, 102, 241, 0.2); color: #6366f1; border: 1px solid rgba(99, 102, 241, 0.3);">
                                 Innovation
@@ -752,16 +930,11 @@
                     </div>
                 `).join('');
             } catch (error) {
-                console.error('Error loading medical news:', error);
-                document.getElementById('medGrid').innerHTML = `
-                    <div class="news-item">
-                        <div class="news-headline">Medical Innovation Tracking Active</div>
-                        <div class="news-summary">Real-time medical breakthrough monitoring system is operational.</div>
-                        <div class="news-meta">
-                            <div class="threat-badge" style="background: rgba(99, 102, 241, 0.2); color: #6366f1;">
-                                System Status
-                            </div>
-                        </div>
+                console.error('Error loading medical news:', error.message);
+                grid.innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Failed to load medical innovations. Please try again later.</p>
                     </div>
                 `;
             }
@@ -771,11 +944,10 @@
         setInterval(async () => {
             await loadData();
             updateStats();
-            
             // Update charts
-            casesChart.data.labels = diseaseData.map(d => d.name);
-            casesChart.data.datasets[0].data = diseaseData.map(d => d.weekly_cases || 0);
-            casesChart.data.datasets[1].data = diseaseData.map(d => d.weekly_cured || 0);
+            casesChart.data.labels = diseaseData.length ? diseaseData.map(d => d.name) : ['No Data'];
+            casesChart.data.datasets[0].data = diseaseData.length ? diseaseData.map(d => d.weekly_cases || 0) : [0];
+            casesChart.data.datasets[1].data = diseaseData.length ? diseaseData.map(d => d.weekly_cured || 0) : [0];
             casesChart.update('none');
             
             const threatCounts = {
@@ -783,7 +955,7 @@
                 'Moderate': outbreakData.filter(o => o.threat_level === 'Moderate').length,
                 'High': outbreakData.filter(o => o.threat_level === 'High').length
             };
-            threatChart.data.datasets[0].data = [threatCounts.Low, threatCounts.Moderate, threatCounts.High];
+            threatChart.data.datasets[0].data = outbreakData.length ? [threatCounts.Low, threatCounts.Moderate, threatCounts.High] : [0, 0, 0];
             threatChart.update('none');
             
             renderDiseases();
@@ -802,6 +974,79 @@
         }
 
         window.addEventListener('load', initDashboard);
+
+        // Chatbot JavaScript
+        const chatbotButton = document.getElementById('chatbotButton');
+        const chatbotWindow = document.getElementById('chatbotWindow');
+        const chatbotClose = document.getElementById('chatbotClose');
+        const chatbotMessages = document.getElementById('chatbotMessages');
+        const chatbotInput = document.getElementById('chatbotInput');
+        const chatbotSend = document.getElementById('chatbotSend');
+
+        chatbotButton.addEventListener('click', () => {
+            chatbotWindow.style.display = 'flex';
+            // Clear previous messages and show welcome message
+            chatbotMessages.innerHTML = '';
+            const welcomeMsg = document.createElement('div');
+            welcomeMsg.classList.add('message', 'bot-message');
+            welcomeMsg.textContent = 'Hi! I am the Health Data Chatbot. I provide information about the Global Health Intelligence Dashboard, including current diseases, outbreaks, and medical innovations. Ask me anything about the data!';
+            chatbotMessages.appendChild(welcomeMsg);
+            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+        });
+
+        chatbotClose.addEventListener('click', () => {
+            chatbotWindow.style.display = 'none';
+        });
+
+        async function sendMessage() {
+            const question = chatbotInput.value.trim();
+            if (!question) return;
+
+            // Add user message
+            const userMsg = document.createElement('div');
+            userMsg.classList.add('message', 'user-message');
+            userMsg.textContent = question;
+            chatbotMessages.appendChild(userMsg);
+            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+
+            chatbotInput.value = '';
+
+            // Send to RAG endpoint
+            try {
+                const response = await fetch('/api/rag-chatbot', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({ question })
+                });
+                if (!response.ok) {
+                    throw new Error(`Chatbot API failed with status ${response.status}: ${await response.text()}`);
+                }
+                const data = await response.json();
+                const answer = data.answer || 'Sorry, something went wrong.';
+
+                // Add bot message
+                const botMsg = document.createElement('div');
+                botMsg.classList.add('message', 'bot-message');
+                botMsg.textContent = answer;
+                chatbotMessages.appendChild(botMsg);
+                chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+            } catch (error) {
+                console.error('Chatbot error:', error.message);
+                const botMsg = document.createElement('div');
+                botMsg.classList.add('message', 'bot-message');
+                botMsg.textContent = 'Error connecting to chatbot. Please try again later.';
+                chatbotMessages.appendChild(botMsg);
+                chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+            }
+        }
+
+        chatbotSend.addEventListener('click', sendMessage);
+        chatbotInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
     </script>
 </body>
 </html>

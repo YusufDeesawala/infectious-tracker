@@ -1,0 +1,112 @@
+[
+    {
+        "headline": "Brazil Battles Record Dengue Outbreak as Cases Soar",
+        "summary": "Brazil is facing its worst-ever dengue fever outbreak, with millions of probable cases reported this year, overwhelming healthcare systems. The surge is attributed to climate change, El Ni\u00f1o, and a new, more effective vaccine being rolled out slowly.",
+        "affected_week": 320000,
+        "affected_month": 1280000,
+        "affected_year": 4500000,
+        "cured_week": 300000,
+        "cured_month": 1200000,
+        "cured_year": 4200000,
+        "threat_level": "High"
+    },
+    {
+        "headline": "DRC Grapples with Worsening Measles Epidemic Amid Vaccination Challenges",
+        "summary": "The Democratic Republic of Congo is experiencing a severe measles epidemic, particularly affecting children. Low vaccination rates, conflict, and displacement continue to hinder response efforts, leading to thousands of new cases and deaths.",
+        "affected_week": 8500,
+        "affected_month": 34000,
+        "affected_year": 380000,
+        "cured_week": 7800,
+        "cured_month": 31000,
+        "cured_year": 340000,
+        "threat_level": "High"
+    },
+    {
+        "headline": "CDC Monitors Avian Flu H5N1 Spread in US Dairy Herds, Second Human Case Reported",
+        "summary": "Highly pathogenic avian influenza (H5N1) continues to spread among dairy cattle herds in multiple U.S. states. A second human case linked to cattle exposure has been confirmed, raising ongoing concerns about potential human adaptation, though human-to-human transmission remains rare.",
+        "affected_week": 1,
+        "affected_month": 2,
+        "affected_year": 2,
+        "cured_week": 0,
+        "cured_month": 1,
+        "cured_year": 1,
+        "threat_level": "Moderate"
+    },
+    {
+        "headline": "Zambia Declares Cholera Emergency as Outbreak Intensifies",
+        "summary": "Zambia is battling a severe cholera outbreak, with thousands of cases and hundreds of deaths reported. Poor sanitation, limited access to clean water, and heavy rains are exacerbating the crisis, prompting emergency response measures and international aid.",
+        "affected_week": 1600,
+        "affected_month": 6400,
+        "affected_year": 28000,
+        "cured_week": 1300,
+        "cured_month": 5200,
+        "cured_year": 23000,
+        "threat_level": "High"
+    },
+    {
+        "headline": "Mpox Outbreak Persists in DRC, Raises Concerns of New Strain Spread",
+        "summary": "The Democratic Republic of Congo is experiencing a sustained Mpox (formerly Monkeypox) outbreak, with thousands of cases reported annually. Concerns are growing about a potentially more virulent strain emerging and spreading, particularly in conflict-affected regions.",
+        "affected_week": 220,
+        "affected_month": 880,
+        "affected_year": 13000,
+        "cured_week": 200,
+        "cured_month": 800,
+        "cured_year": 12000,
+        "threat_level": "Moderate"
+    },
+    {
+        "headline": "Whooping Cough Cases Surge in UK and Europe Amid Low Vaccination Rates",
+        "summary": "Several European countries, including the UK, are seeing a significant rise in pertussis (whooping cough) cases, particularly among infants. Health officials attribute the surge to declining vaccination coverage during the pandemic and increased pathogen circulation.",
+        "affected_week": 550,
+        "affected_month": 2200,
+        "affected_year": 11000,
+        "cured_week": 500,
+        "cured_month": 2000,
+        "cured_year": 10000,
+        "threat_level": "Moderate"
+    },
+    {
+        "headline": "CDC Reports Spike in Norovirus Outbreaks on Cruise Ships and Restaurants",
+        "summary": "The Centers for Disease Control and Prevention (CDC) has noted an increase in norovirus outbreaks reported on cruise ships and in various food service settings. These highly contagious gastrointestinal illnesses often lead to rapid, temporary disruption but are rarely life-threatening.",
+        "affected_week": 180,
+        "affected_month": 720,
+        "affected_year": 3500,
+        "cured_week": 175,
+        "cured_month": 700,
+        "cured_year": 3400,
+        "threat_level": "Low"
+    },
+    {
+        "headline": "WHO Warns of Rising CCHF Cases in Endemic Regions Ahead of Seasonal Risks",
+        "summary": "The World Health Organization is highlighting an increase in Crimean-Congo Hemorrhagic Fever (CCHF) cases in several endemic regions, including Pakistan and parts of Africa, often linked to animal handling and tick exposure during seasonal events. The disease is tick-borne and can be fatal.",
+        "affected_week": 12,
+        "affected_month": 48,
+        "affected_year": 250,
+        "cured_week": 7,
+        "cured_month": 28,
+        "cured_year": 150,
+        "threat_level": "Moderate"
+    },
+    {
+        "headline": "Paraguay Battles Sustained Chikungunya Outbreak After Record Season",
+        "summary": "Paraguay is experiencing a continued high burden of Chikungunya cases following a record-breaking season. The mosquito-borne virus causes severe joint pain and fever, putting a significant strain on public health resources in the region.",
+        "affected_week": 1100,
+        "affected_month": 4400,
+        "affected_year": 160000,
+        "cured_week": 1050,
+        "cured_month": 4200,
+        "cured_year": 150000,
+        "threat_level": "Moderate"
+    },
+    {
+        "headline": "Public Health Authorities Investigate Clusters of Legionnaires' Disease",
+        "summary": "Health authorities in various regions, including parts of Europe and the U.S., are investigating localized clusters of Legionnaires' disease. These outbreaks are typically linked to contaminated water systems in large buildings, causing severe pneumonia, especially in vulnerable populations.",
+        "affected_week": 6,
+        "affected_month": 24,
+        "affected_year": 120,
+        "cured_week": 5,
+        "cured_month": 20,
+        "cured_year": 105,
+        "threat_level": "Low"
+    }
+]
